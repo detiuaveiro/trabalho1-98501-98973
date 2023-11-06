@@ -10,7 +10,8 @@
 /// 2013, 2023
 
 // Student authors (fill in below):
-// NMec:  Name:
+// NMec: 98501 Name: Diogo Ferreira Martins
+// NMec: 98973 Name: Bernardo Costa
 // 
 // 
 // 
