@@ -354,16 +354,11 @@ int ImageValidPos(Image img, int x, int y) { ///
 int ImageValidRect(Image img, int x, int y, int w, int h) { ///
   assert (img != NULL);
   // Insert your code here!
-  if (x>=0 && y>=0 && w>0 && h>0){
-    int imgWidth = ImageWidth(img);
-    int imgHeight = ImageHeight(img);
-
-    //Verifica se a área definida pelo retangulo está dentro dos limites da imagem
-    if (x+y <= imgWidth && y+h <= imgHeight){
-      return 1; //A área é válida
-    }
+  // Verifica se as coordenadas do retângulo estão dentro da imagem
+  if (ImageValidPos(img, x, y) && ImageValidPos(img, x + w - 1, y + h - 1)) { 
+    return 1;
   }
-  return 0; //A área não é válida
+  return 0;
 }
 
 /// Pixel get & set operations
@@ -455,7 +450,7 @@ void ImageThreshold(Image img, uint8 thr) { ///
 /// darken the image if factor<1.0.
 void ImageBrighten(Image img, double factor) { ///
   assert (img != NULL);
-  // ? assert (factor >= 0.0);
+  assert (factor >= 0.0);
   // Insert your code here!
 
   //Percorre cada pixel e aplica o fator de clareamento
@@ -534,23 +529,27 @@ Image ImageMirror(Image img) { ///
   // Cria uma nova imagem com as mesmas dimensões
   Image mirroredImage = ImageCreate(img->width, img->height, img->maxval);
   if (mirroredImage == NULL){
-    //Falha na cração da nova imagem
+    //Falha na criação da nova imagem
     return NULL;
   }
 
   //Percorre os pixels da imagem original e inverte horizontalmente
   for (int y = 0; y < img->height; y++) {
-    for (int x = 0; x < img->width; x++) {
-      uint8 nivelAtual = ImageGetPixel(img,x,y);
-
+    for (int x = 0; x < img->width/2; x++) {
+      
       //Define as novas coordenadas na imagem espelhada
       int newX = img->width - x - 1;
-      int newY = y;
+
+      uint8 nivelAtual_1 = ImageGetPixel(img,x,y);
+      uint8 nivelAtual_2 = ImageGetPixel(img,newX,y);
 
       //Define o novo pixel na imagem espelhada
-      ImageSetPixel(mirroredImage, newX, newY, nivelAtual);
+      ImageSetPixel(mirroredImage, x, y, nivelAtual_2);
+      ImageSetPixel(mirroredImage, newX, y, nivelAtual_1);
+
     }
   }
+  return mirroredImage;
 }
 
 /// Crop a rectangular subimage from img.
@@ -634,7 +633,12 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
       uint8 nivelImg1 = ImageGetPixel(img1, x + dx, y + dy);
 
       // Realiza a mistura usando a fórmula: novo_nível = alpha * nivel_img2 + (1 - alpha) * nivel_img1
-      uint8 novoNivel = (uint8)(alpha * nivelImg2 + (1.0 - alpha) * nivelImg1);
+      double novoNivel = (double)(alpha * nivelImg2 + (1.0 - alpha) * nivelImg1);
+      // Satura o novo nível
+      novoNivel = (novoNivel > PixMax) ? PixMax : novoNivel;
+      novoNivel = (novoNivel < 0) ? 0 : novoNivel;
+
+      novoNivel = (uint8)novoNivel;
 
       // Define o novo nível de pixel na imagem de destino (img1) nas coordenadas específicas
       ImageSetPixel(img1, x + dx, y + dy, novoNivel);
