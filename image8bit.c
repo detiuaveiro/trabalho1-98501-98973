@@ -450,7 +450,7 @@ void ImageThreshold(Image img, uint8 thr) { ///
 /// darken the image if factor<1.0.
 void ImageBrighten(Image img, double factor) { ///
   assert (img != NULL);
-  //assert (factor >= 0.0);
+  assert (factor >= 0.0);
   // Insert your code here!
 
   //Percorre cada pixel e aplica o fator de clareamento
@@ -459,7 +459,7 @@ void ImageBrighten(Image img, double factor) { ///
       //Obtém o nível de pixel atual
       uint8 nivelAtual = ImageGetPixel(img,x,y);  
       
-      uint8 novoNivel = (uint8)(nivelAtual * factor);
+      uint8 novoNivel = (uint8)(nivelAtual * factor+0.5);
       novoNivel = (novoNivel > PixMax) ? PixMax : novoNivel;
 
       //Define o novo nível de pixel
@@ -634,15 +634,15 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
       uint8 nivelImg1 = ImageGetPixel(img1, x + dx, y + dy);
 
       // Realiza a mistura usando a fórmula: novo_nível = alpha * nivel_img2 + (1 - alpha) * nivel_img1
-      double novoNivel = (double)(alpha * nivelImg2 + (1.0 - alpha) * nivelImg1);
+      double novoNivel = (double)(alpha * nivelImg2 + (1.0 - alpha) * nivelImg1+0.5);
       // Satura o novo nível
       novoNivel = (novoNivel > PixMax) ? PixMax : novoNivel;
       novoNivel = (novoNivel < 0) ? 0 : novoNivel;
 
-      novoNivel = (uint8)novoNivel;
+      //novoNivel = (uint8)novoNivel;
 
       // Define o novo nível de pixel na imagem de destino (img1) nas coordenadas específicas
-      ImageSetPixel(img1, x + dx, y + dy, novoNivel);
+      ImageSetPixel(img1, x + dx, y + dy, (uint8)novoNivel);
     }
   }
 }
@@ -742,8 +742,8 @@ void ImageBlur(Image img, int dx, int dy) { ///
 
       // Calcula a média e define o novo valor do pixel na imagem temporária
       if (count > 0) {
-        uint8 average = sum / count;
-        ImageSetPixel(temp, x, y, average);
+        double average = (double)sum / count;
+        ImageSetPixel(temp, x, y, (uint8)(average+0.5));
       }
     }
   }
