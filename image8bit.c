@@ -450,14 +450,15 @@ void ImageThreshold(Image img, uint8 thr) { ///
 /// darken the image if factor<1.0.
 void ImageBrighten(Image img, double factor) { ///
   assert (img != NULL);
-  assert (factor >= 0.0);
+  assert (factor > -1.0);
   // Insert your code here!
 
   //Percorre cada pixel e aplica o fator de clareamento
   for (int y = 0; y < img->height; y++){
     for (int x = 0; x < img->width; x++){
+      //Obtém o nível de pixel atual
       uint8 nivelAtual = ImageGetPixel(img,x,y);  
-      //
+
       uint8 novoNivel = (uint8)(nivelAtual * factor);
       novoNivel = (novoNivel > PixMax) ? PixMax : novoNivel;
 
